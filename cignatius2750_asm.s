@@ -16,12 +16,13 @@
 @ Returns: r0
 
 cignatius2750_add_test:
-    push {r4, lr}
+    push {r4, r5, lr}
     add r4, r0, r1
-    ldr r0, =0xFFFFFF
+    mov r5, r2
+    mov r0, r5
     bl busy_delay
     mov r0, r4
-    pop {r4, pc}
+    pop {r4, r5, pc}
 
 
 @ Function Declaration : int busy_delay(int cycles)
