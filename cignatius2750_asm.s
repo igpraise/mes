@@ -1,3 +1,18 @@
+@ cignatius2750_asm.s Data section - initialized values
+.data
+.align 3
+
+huge:   .octa 0xAABBCCDDDDCCBBFF
+big:    .word 0xAAEEBBFF
+num:    .byte 0xAB
+str2:   .asciz "Guten Tag!"
+count:  .word 12345
+
+@ End of new data section
+
+
+
+
 @ Test code for my own new function called from C
 
     .code   16
@@ -15,8 +30,34 @@
 @ Input: r0, r1 (i.e. r0 holds x, r1 holds y)
 @ Returns: r0
 
+
+
+
 cignatius2750_add_test:
     push {r4, r5, lr}
+
+    ldr r0, =num
+    ldr r0, =big
+    ldr r0, =huge
+    ldr r0, =str2
+
+    ldr r2, =str2
+    ldrb r0, [r2]
+
+    ldr r2, =str2
+    ldr r0, [r2]
+
+    ldr r2, =num
+    ldrb r0, [r2]
+
+    ldr r2, =big
+    ldr r0, [r2]
+
+    ldr r2, =huge
+    ldrd r0, r1, [r2]
+
+    bkpt
+
     add r4, r0, r1
     mov r5, r2
     mov r0, r5
