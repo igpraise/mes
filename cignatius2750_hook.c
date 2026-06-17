@@ -43,8 +43,23 @@ void Assignment2(int action)
            );
     return;
   }
-  // Retrieve user inputs for count and delay here
-  printf("cignatius2750_a2 returned: %d\n", cignatius2750_a2 (99, 87) );
+  uint32_t count_input;
+  uint32_t delay_input;
+  int fetch_status;
+
+  fetch_status = fetch_uint32_arg(&count_input);
+  if(fetch_status) {
+    // Use a default value
+    count_input = 3;
+  }
+
+  fetch_status = fetch_uint32_arg(&delay_input);
+  if(fetch_status) {
+    // Use a default value
+    delay_input = 0xFFFFF;
+  }
+
+  printf("cignatius2750_a2 returned: %d\n", cignatius2750_a2(count_input, delay_input) );
 }
 
 ADD_CMD("cignatius2750_a2", Assignment2, "Assignment 2")
