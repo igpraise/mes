@@ -66,6 +66,24 @@ cignatius2750_add_test:
     pop {r4, r5, pc}
 
 
+.align  2               @ Code alignment is 2^n alignment (n=2)
+    .syntax unified         @ Sets the instruction set to the unified ARM + THUMB
+    .global cignatius2750_a2   @ Make the symbol name for the function visible to the linker
+    .code   16              @ 16bit THUMB code (BOTH .code and .thumb_func are required)
+    .thumb_func             @ Specifies that the following symbol is the name of a THUMB
+    .type   cignatius2750_a2, %function
+
+@ Function Declaration : int cignatius2750_a2 (int num, int wait)
+@
+@ Input: r0 (num), r1 (wait)
+@ Returns: r0 (total number of LED toggles performed)
+@
+cignatius2750_a2:
+    @ Fill in the necessary logic here
+    bx lr
+    .size   cignatius2750_a2, .- cignatius2750_a2
+
+
 @ Function Declaration : int busy_delay(int cycles)
 @
 @ Input: r0 (i.e. r0 holds number of cycles to delay)

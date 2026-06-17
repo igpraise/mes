@@ -9,6 +9,7 @@
 #include "common.h"
 
 int cignatius2750_add_test(int x, int y, uint32_t delay);
+int cignatius2750_a2(int num, int wait);
 
 void AddTest(int action)
 {
@@ -32,3 +33,18 @@ void AddTest(int action)
 
   
 ADD_CMD("cignatius2750_add", AddTest,"Test the new add function")
+
+void Assignment2(int action)
+{
+  if(action==CMD_SHORT_HELP) return;
+  if(action==CMD_LONG_HELP) {
+    printf("Assignment 2\n\n"
+           "This command triggers assignment 2 by cignatius2750\n"
+           );
+    return;
+  }
+  // Retrieve user inputs for count and delay here
+  printf("cignatius2750_a2 returned: %d\n", cignatius2750_a2 (99, 87) );
+}
+
+ADD_CMD("cignatius2750_a2", Assignment2, "Assignment 2")

@@ -1,0 +1,33 @@
+[33mcommit d421950844bcbd605e46eb894dd74bbd0ac4885c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m
+Author: chinonso praise ignatius <cignatius2750@conestogac.on.ca>
+Date:   Wed Jun 3 19:11:53 2026 -0400
+
+    Made the delay variable
+
+cignatius2750_asm.s
+cignatius2750_hook.c
+
+[33mcommit a931dbb8fff35ae1c6590416ed158deba62772a3[m
+Author: chinonso praise ignatius <cignatius2750@conestogac.on.ca>
+Date:   Wed Jun 3 19:04:27 2026 -0400
+
+    Calling busy_delay from cignatius2750_add_test
+
+cignatius2750_asm.s
+
+[33mcommit 40b144af8b78cdb731dd7b77dae3157e3c00d331[m
+Author: chinonso praise ignatius <cignatius2750@conestogac.on.ca>
+Date:   Wed Jun 3 18:58:06 2026 -0400
+
+    Added a busy delay function
+
+cignatius2750_asm.s
+
+[33mcommit f2b1d3d071f6017b0057a5ed538eb513f3a50823[m
+Author: chinonso praise ignatius <cignatius2750@conestogac.on.ca>
+Date:   Wed Jun 3 09:41:33 2026 -0400
+
+    Initial Commit by cignatius2750
+
+cignatius2750_asm.s
+cignatius2750_hook.c
