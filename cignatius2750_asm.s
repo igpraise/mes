@@ -104,6 +104,20 @@ inner_loop:
     mov  r0, r7                 @ Put total toggle count into r0 (our return value)
     pop  {r4, r5, r6, r7, pc}   @ Restore registers and return (pc = pop into program counter)
     .size   cignatius2750_a2, .- cignatius2750_a2
+.global cignatius2750_string_test
+    .code   16
+    .thumb_func
+    .type   cignatius2750_string_test, %function
+
+@ Function Declaration : int cignatius2750_string_test(char *p)
+@
+@ Input: r0 (i.e. r0 a pointer to a byte array)
+@ Returns: r0
+@
+@ Here is the actual function
+cignatius2750_string_test:
+    bx lr
+    .size   cignatius2750_string_test, .-cignatius2750_string_test
 @ Function Declaration : int busy_delay(int cycles)
 @
 @ Input: r0 (i.e. r0 holds number of cycles to delay)
