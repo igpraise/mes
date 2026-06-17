@@ -79,11 +79,31 @@ cignatius2750_add_test:
 @ Returns: r0 (total number of LED toggles performed)
 @
 cignatius2750_a2:
-    @ Fill in the necessary logic here
-    bx lr
+    push {r4, r5, r6, r7, lr}   @ Save registers we'll use, and the return address
+    mov  r4, r0                 @ r4 = num (repeat count) - save it before r0 gets overwritten by calls
+    mov  r5, r1                 @ r5 = wait (delay value) - save it before r1 gets overwritten by calls
+    movs r6, #0                 @ r6 = LED index, starts at 0 (will count 0 to 7)
+    movs r7, #0                 @ r7 = total toggle count, starts at 0
+
+outer_loop:
+    movs r6, #0                 @ Reset LED index to 0 at the start of each repeat
+
+inner_loop:
+    mov  r0, r6                 @ Put current LED index into r0 (BSP_LED_Toggle's argument)
+    bl   BSP_LED_Toggle         @ Toggle that LED
+    add  r7, r7, #1             @ Count this toggle (increment total)
+    mov  r0, r5                 @ Put wait value into r0 (busy_delay's argument)
+    bl   busy_delay              @ Wait before the next toggle
+    add  r6, r6, #1             @ Move to next LED index
+    cmp  r6, #8                 @ Have we done all 8 LEDs yet?
+    blt  inner_loop              @ If not, keep toggling
+
+    subs r4, r4, #1             @ One repeat finished, decrement num
+    bgt  outer_loop              @ If more repeats remain, start over
+
+    mov  r0, r7                 @ Put total toggle count into r0 (our return value)
+    pop  {r4, r5, r6, r7, pc}   @ Restore registers and return (pc = pop into program counter)
     .size   cignatius2750_a2, .- cignatius2750_a2
-
-
 @ Function Declaration : int busy_delay(int cycles)
 @
 @ Input: r0 (i.e. r0 holds number of cycles to delay)
