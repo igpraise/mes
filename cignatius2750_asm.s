@@ -105,7 +105,7 @@ inner_loop:
     pop  {r4, r5, r6, r7, pc}   @ Restore registers and return (pc = pop into program counter)
     .size   cignatius2750_a2, .- cignatius2750_a2
 .global cignatius2750_string_test
-    .code   16
+.code   16
     .thumb_func
     .type   cignatius2750_string_test, %function
 
@@ -116,7 +116,14 @@ inner_loop:
 @
 @ Here is the actual function
 cignatius2750_string_test:
-    bx lr
+StringLoop:
+    ldrb r1, [r0]                @ Load the byte that r0 points to, into r1
+    cmp  r1, #0                  @ Check if that byte is zero (end of string)
+    beq  OutLabel                @ If it is zero, we're done - branch out
+    add  r0, r0, #1              @ Move to the next character (next address)
+    b    StringLoop               @ Go back and check the next character
+OutLabel:
+    bx lr                        @ Return (r0 now holds the address right after the last character)
     .size   cignatius2750_string_test, .-cignatius2750_string_test
 @ Function Declaration : int busy_delay(int cycles)
 @
