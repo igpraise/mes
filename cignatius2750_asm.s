@@ -25,11 +25,10 @@
 
     .type   cignatius2750_lab6, %function   @ Declares that the symbol is a function (not strictly required)
 
-@ Function Declaration : int cignatius2750_lab6(int x, int y)
+@ Function Declaration: int cignatius2750_lab6(uint32_t delay)
 @
-@ Input: r0, r1 (i.e. r0 holds x, r1 holds y)
-@ Returns: r0
-@ 
+@ Input: r0 holds the delay value
+@ Returns: r0 holds the number of LED toggles
 
 @ Here is the actual cignatius2750_lab6 function
 cignatius2750_lab6:
