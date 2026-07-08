@@ -11,7 +11,7 @@
 
 #include "common.h"
 
-int cignatius2750_lab6(int x, int y);
+int cignatius2750_lab6(uint32_t delay);
 
 void Lab6_cignatius2750(int action)
 {
@@ -24,7 +24,16 @@ void Lab6_cignatius2750(int action)
 
     return;
   }
-  printf("cignatius2750_lab6 returned: %d\n", cignatius2750_lab6(99, 87) );
+  uint32_t delay;
+int fetch_status;
+
+fetch_status = fetch_uint32_arg(&delay);
+
+if (fetch_status) {
+  delay = 0xFFFFF;
+}
+
+printf("cignatius2750_lab6 returned: %d\n", cignatius2750_lab6(delay) );
 }
 
 ADD_CMD("cignatius2750_lab6", Lab6_cignatius2750,"Test the new lab 6 function")

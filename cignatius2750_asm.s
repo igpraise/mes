@@ -33,13 +33,38 @@
 
 @ Here is the actual cignatius2750_lab6 function
 cignatius2750_lab6:
-    push {lr}
+    push {r4-r7, lr}
+
+    mov r4, r0
+    mov r5, #7
+    mov r6, #0
+
+lab6_loop:
+    cmp r5, #0
+    bge lab6_toggle
+
+    mov r5, #7
+
+lab6_toggle:
+    mov r0, r5
+    bl BSP_LED_Toggle
+
+    add r6, r6, #1
+    sub r5, r5, #1
+
+    mov r0, r4
+    bl busy_delay
 
     mov r0, #0
     bl BSP_PB_GetState
 
-    pop {lr}
-    bx lr                           @ Return (Branch eXchange) to the address in the link register (lr) 
+    cmp r0, #0
+    beq lab6_loop
+
+    mov r0, r6
+
+    pop {r4-r7, lr}
+    bx lr           @ Return (Branch eXchange) to the address in the link register (lr) 
     .size   cignatius2750_lab6, .-cignatius2750_lab6    @@ - symbol size (not strictly required, but makes the debugger happy)
 
 
