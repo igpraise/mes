@@ -52,8 +52,9 @@ void Lab7_cignatius2750(int action)
   }
 
   uint32_t count;
-  uint32_t delay;
-  int fetch_status;
+uint32_t delay;
+uint32_t axis;
+int fetch_status;
 
   fetch_status = fetch_uint32_arg(&count);
 
@@ -63,23 +64,45 @@ void Lab7_cignatius2750(int action)
 
   fetch_status = fetch_uint32_arg(&delay);
 
-  if (fetch_status) {
-    delay = 0xFFFFF;
-  }
+if (fetch_status) {
+  delay = 0xFFFFF;
+}
+
+fetch_status = fetch_uint32_arg(&axis);
+
+if (fetch_status) {
+  axis = 0;
+}
 
   for (uint32_t i = 0; i < count; i++) {
     float xyz[3] = {0};
 
     BSP_GYRO_GetXYZ(xyz);
 
-    printf("Gyroscope returns:\n"
-           " X: %f\n"
-           " Y: %f\n"
-           " Z: %f\n",
-           xyz[0] / 256,
-           xyz[1] / 256,
-           xyz[2] / 256);
-
+    if (axis == 1) {
+  printf("Gyroscope returns:\n"
+         " X: %f\n",
+         xyz[0] / 256);
+}
+else if (axis == 2) {
+  printf("Gyroscope returns:\n"
+         " Y: %f\n",
+         xyz[1] / 256);
+}
+else if (axis == 3) {
+  printf("Gyroscope returns:\n"
+         " Z: %f\n",
+         xyz[2] / 256);
+}
+else {
+  printf("Gyroscope returns:\n"
+         " X: %f\n"
+         " Y: %f\n"
+         " Z: %f\n",
+         xyz[0] / 256,
+         xyz[1] / 256,
+         xyz[2] / 256);
+}
     printf("cignatius2750_lab7 returned: %d\n", cignatius2750_lab7(delay) );
   }
 }
