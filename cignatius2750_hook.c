@@ -10,8 +10,11 @@
 #include <ctype.h>
 
 #include "common.h"
+#include "stm32f3_discovery_gyroscope.h"
+
 
 int cignatius2750_lab6(uint32_t delay);
+int cignatius2750_lab7(void);
 
 void Lab6_cignatius2750(int action)
 {
@@ -37,6 +40,33 @@ printf("cignatius2750_lab6 returned: %d\n", cignatius2750_lab6(delay) );
 }
 
 ADD_CMD("cignatius2750_lab6", Lab6_cignatius2750,"Test the new lab 6 function")
+void Lab7_cignatius2750(int action)
+{
+  if(action==CMD_SHORT_HELP) return;
+  if(action==CMD_LONG_HELP) {
+    printf("Lab 7\n\n"
+           "This command tests new lab 7 function by cignatius2750\n"
+           );
+
+    return;
+  }
+
+  float xyz[3] = {0};
+
+  BSP_GYRO_GetXYZ(xyz);
+
+  printf("Gyroscope returns:\n"
+         " X: %f\n"
+         " Y: %f\n"
+         " Z: %f\n",
+         xyz[0] / 256,
+         xyz[1] / 256,
+         xyz[2] / 256);
+
+  printf("cignatius2750_lab7 returned: %d\n", cignatius2750_lab7() );
+}
+
+ADD_CMD("cignatius2750_lab7", Lab7_cignatius2750,"Test the new lab 7 function")
 
 int cignatius2750_a3(char *pattern_ptr);
 

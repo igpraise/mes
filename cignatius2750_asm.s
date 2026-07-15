@@ -66,6 +66,27 @@ lab6_toggle:
     bx lr           @ Return (Branch eXchange) to the address in the link register (lr) 
     .size   cignatius2750_lab6, .-cignatius2750_lab6    @@ - symbol size (not strictly required, but makes the debugger happy)
 
+@@ Function Header Block
+    .global cignatius2750_lab7
+    .type cignatius2750_lab7, %function
+
+@ Function Declaration: int cignatius2750_lab7(void)
+@
+@ Input: none
+@ Returns: r0
+
+cignatius2750_lab7:
+    push {lr}
+
+    ldr r0, =0xFFFFF
+    bl busy_delay
+
+    mov r0, #7
+
+    pop {lr}
+    bx lr
+
+    .size cignatius2750_lab7, .-cignatius2750_lab7
 
 .global cignatius2750_a3
 .type   cignatius2750_a3, %function
