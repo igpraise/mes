@@ -14,7 +14,7 @@
 
 
 int cignatius2750_lab6(uint32_t delay);
-int cignatius2750_lab7(void);
+int cignatius2750_lab7(uint32_t delay);
 
 void Lab6_cignatius2750(int action)
 {
@@ -63,7 +63,7 @@ void Lab7_cignatius2750(int action)
          xyz[1] / 256,
          xyz[2] / 256);
 
-  printf("cignatius2750_lab7 returned: %d\n", cignatius2750_lab7() );
+ printf("cignatius2750_lab7 returned: %d\n", cignatius2750_lab7(0xFFFFF) );
 }
 
 ADD_CMD("cignatius2750_lab7", Lab7_cignatius2750,"Test the new lab 7 function")

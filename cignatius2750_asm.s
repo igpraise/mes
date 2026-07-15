@@ -70,24 +70,21 @@ lab6_toggle:
     .global cignatius2750_lab7
     .type cignatius2750_lab7, %function
 
-@ Function Declaration: int cignatius2750_lab7(void)
+@ Function Declaration: int cignatius2750_lab7(uint32_t delay)
 @
-@ Input: none
+@ Input: r0 holds the delay value
 @ Returns: r0
 
 cignatius2750_lab7:
     push {lr}
 
-    ldr r0, =0xFFFFF
     bl busy_delay
-
-    mov r0, #7
 
     pop {lr}
     bx lr
 
     .size cignatius2750_lab7, .-cignatius2750_lab7
-
+    
 .global cignatius2750_a3
 .type   cignatius2750_a3, %function
 
