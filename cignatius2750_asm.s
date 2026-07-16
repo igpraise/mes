@@ -114,13 +114,26 @@ a3_pattern_loop:
     cmp r0, #0              @ Check for end of string
     beq a3_repeat_done      @ If pattern ended, one repeat is done
 
-    and r0, r0, #0x0F       @ Convert ASCII character to LED number
+    cmp r0, #'0'            @ Check if character is below '0'
+    blt a3_next_char        @ If invalid, skip it
+
+    cmp r0, #'7'            @ Check if character is above '7'
+    bgt a3_next_char        @ If invalid, skip it
+
+    sub r0, r0, #'0'        @ Convert ASCII digit to LED number
     bl BSP_LED_Toggle       @ Toggle selected LED
     add r7, r7, #1          @ Increase toggle count
 
     mov r0, r4              @ Pass wait delay to busy_delay
     bl busy_delay           @ Wait between toggles
 
+    mov r0, #0              @ User button number
+    bl BSP_PB_GetState      @ Read blue user button
+
+    cmp r0, #0              @ 0 means button not pressed
+    bne a3_done             @ If pressed, stop early
+
+a3_next_char:
     add r8, r8, #1          @ Move to next character
     b a3_pattern_loop       @ Continue pattern loop
 
