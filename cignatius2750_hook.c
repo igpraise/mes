@@ -116,9 +116,9 @@ void A3_cignatius2750(int action)
 
   if(action==CMD_SHORT_HELP) return;
   if(action==CMD_LONG_HELP) {
-    printf("Assignment 3 Test\n\n"
-	   "This is the A3 function by cignatius2750\n"
-	   );
+    printf("Assignment 3: Blinking Lights\n");
+printf("Usage: cignatius2750_a3 wait pattern num\n");
+printf("Example: cignatius2750_a3 0xFFFFF 11234 5\n");
 
     return;
   }
