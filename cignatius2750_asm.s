@@ -100,14 +100,19 @@ cignatius2750_a3:
 
     mov r4, r0              @ r4 = wait delay value
     mov r5, r1              @ r5 = pointer to pattern string
-    mov r6, r2              @ r6 = number of repeats
+    mov r6, r2              @ r6 = number of repeats remaining
     mov r7, #0              @ r7 = count of BSP_LED_Toggle calls
-    mov r8, r5              @ r8 = current character pointer
+
+a3_repeat_loop:
+    cmp r6, #0              @ Check if all repeats are finished
+    beq a3_done             @ If no repeats remain, finish
+
+    mov r8, r5              @ Restart pattern from first character
 
 a3_pattern_loop:
     ldrb r0, [r8]           @ Load current pattern character
     cmp r0, #0              @ Check for end of string
-    beq a3_done             @ If string ended, finish this step
+    beq a3_repeat_done      @ If pattern ended, one repeat is done
 
     and r0, r0, #0x0F       @ Convert ASCII character to LED number
     bl BSP_LED_Toggle       @ Toggle selected LED
@@ -119,12 +124,16 @@ a3_pattern_loop:
     add r8, r8, #1          @ Move to next character
     b a3_pattern_loop       @ Continue pattern loop
 
+a3_repeat_done:
+    sub r6, r6, #1          @ One full pattern repeat is complete
+    b a3_repeat_loop        @ Start next repeat if needed
+
 a3_done:
     mov r0, r7              @ Return number of LED toggles
 
     pop {r4-r8, lr}         @ Restore saved registers
     bx lr                   @ Return to C hook
-    .size   cignatius2750_a3, .-cignatius2750_a3@ Function Declaration: int busy_delay(int cycles)
+    .size   cignatius2750_a3, .-cignatius2750_a3
 @
 @ Input: r0 (i.e. r0 is how many cycles to delay)
 @ Returns: r0
