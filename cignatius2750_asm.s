@@ -84,7 +84,7 @@ cignatius2750_lab7:
     bx lr
 
     .size cignatius2750_lab7, .-cignatius2750_lab7
-    
+
 .global cignatius2750_a3
 .type   cignatius2750_a3, %function
 
@@ -96,8 +96,19 @@ cignatius2750_lab7:
 
 @ Here is the function
 cignatius2750_a3:
+    push {r4-r6, lr}        @ Save registers used by this function
 
-    bx lr
+    mov r4, r0              @ r4 = wait delay value
+    mov r5, r1              @ r5 = pointer to pattern string
+    mov r6, r2              @ r6 = number of repeats
+
+    mov r0, r4              @ Pass wait delay to busy_delay
+    bl busy_delay           @ Call busy_delay(wait)
+
+    mov r0, #0              @ Return 0 toggles for this starter step
+
+    pop {r4-r6, lr}         @ Restore saved registers
+    bx lr                   @ Return to C hook
     .size   cignatius2750_a3, .-cignatius2750_a3
 
 @ Function Declaration: int busy_delay(int cycles)
