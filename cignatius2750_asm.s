@@ -96,21 +96,27 @@ cignatius2750_lab7:
 
 @ Here is the function
 cignatius2750_a3:
-    push {r4-r6, lr}        @ Save registers used by this function
+    push {r4-r7, lr}        @ Save registers used by this function
 
     mov r4, r0              @ r4 = wait delay value
     mov r5, r1              @ r5 = pointer to pattern string
     mov r6, r2              @ r6 = number of repeats
+    mov r7, #0              @ r7 = count of BSP_LED_Toggle calls
+
+    ldrb r0, [r5]           @ Load first character from pattern
+    and r0, r0, #0x0F       @ Convert ASCII character to LED number
+
+    bl BSP_LED_Toggle       @ Toggle the LED
+    add r7, r7, #1          @ Increase toggle count
 
     mov r0, r4              @ Pass wait delay to busy_delay
     bl busy_delay           @ Call busy_delay(wait)
 
-    mov r0, #0              @ Return 0 toggles for this starter step
+    mov r0, r7              @ Return number of toggles
 
-    pop {r4-r6, lr}         @ Restore saved registers
+    pop {r4-r7, lr}         @ Restore saved registers
     bx lr                   @ Return to C hook
     .size   cignatius2750_a3, .-cignatius2750_a3
-
 @ Function Declaration: int busy_delay(int cycles)
 @
 @ Input: r0 (i.e. r0 is how many cycles to delay)
