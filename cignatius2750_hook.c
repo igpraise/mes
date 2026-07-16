@@ -109,7 +109,7 @@ else {
 
 ADD_CMD("cignatius2750_lab7", Lab7_cignatius2750,"Test the new lab 7 function")
 
-int cignatius2750_a3(char *pattern_ptr);
+int cignatius2750_a3(uint32_t wait, char *pattern_ptr, uint32_t num);
 
 void A3_cignatius2750(int action)
 {
@@ -123,17 +123,30 @@ void A3_cignatius2750(int action)
     return;
   }
 
-  int fetch_status;
-  char *pattern;
+int fetch_status;
+uint32_t wait;
+char *pattern;
+uint32_t num;
 
-  fetch_status = fetch_string_arg(&pattern);
+  fetch_status = fetch_uint32_arg(&wait);
 
-  if (fetch_status) {
-    // Default logic goes here
-    pattern = "Test Pattern";
-  }
+if (fetch_status) {
+  wait = 0xFFFFF;
+}
 
-  printf("cignatius2750_a3 returned: %d\n", cignatius2750_a3(pattern) );
+fetch_status = fetch_string_arg(&pattern);
+
+if (fetch_status) {
+  pattern = "1234";
+}
+
+fetch_status = fetch_uint32_arg(&num);
+
+if (fetch_status) {
+  num = 5;
+}
+
+printf("cignatius2750_a3 returned: %d\n", cignatius2750_a3(wait, pattern, num) );
 }
 
 ADD_CMD("cignatius2750_a3", A3_cignatius2750,"Run A3 for cignatius2750")
