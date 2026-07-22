@@ -1,86 +1,152 @@
 /*
- *	C to assembler menu hook
+ *  C to assembler menu hook
+ *
+ *  Modified by cignatius2750
  * 
  */
 
 #include <stdio.h>
 #include <stdint.h>
 #include <ctype.h>
+
 #include "common.h"
+#include "stm32f3_discovery_gyroscope.h"
 
-int cignatius2750_add_test(int x, int y, uint32_t delay);
-int cignatius2750_a2(int num, int wait);
-int cignatius2750_string_test(char *p);
 
-void AddTest(int action)
+int cignatius2750_lab6(uint32_t delay);
+int cignatius2750_lab7(uint32_t delay);
+
+void Lab6_cignatius2750(int action)
 {
+
   if(action==CMD_SHORT_HELP) return;
   if(action==CMD_LONG_HELP) {
-    printf("Addition Test\n\n"
-       "This command tests new addition function by cignatius2750\n"
-       );
+    printf("Lab 6\n\n"
+	   "This command tests new lab 6 function by cignatius2750\n"
+	   );
+
     return;
   }
-
   uint32_t delay;
-  int fetch_status;
-  fetch_status = fetch_uint32_arg(&delay);
-  if(fetch_status) {
-    delay = 0xFFFFFF;
-  }
+int fetch_status;
 
-  printf("cignatius2750_add_test returned: %d\n", cignatius2750_add_test(99, 87, delay) );
+fetch_status = fetch_uint32_arg(&delay);
+
+if (fetch_status) {
+  delay = 0xFFFFF;
 }
 
-  
-ADD_CMD("cignatius2750_add", AddTest,"Test the new add function")
+printf("cignatius2750_lab6 returned: %d\n", cignatius2750_lab6(delay) );
+}
 
-void Assignment2(int action)
+ADD_CMD("cignatius2750_lab6", Lab6_cignatius2750,"Test the new lab 6 function")
+void Lab7_cignatius2750(int action)
 {
   if(action==CMD_SHORT_HELP) return;
   if(action==CMD_LONG_HELP) {
-    printf("Assignment 2\n\n"
-           "This command triggers assignment 2 by cignatius2750\n"
+    printf("Lab 7\n\n"
+           "This command tests new lab 7 function by cignatius2750\n"
            );
+
     return;
   }
-  uint32_t count_input;
-  uint32_t delay_input;
-  int fetch_status;
 
-  fetch_status = fetch_uint32_arg(&count_input);
-  if(fetch_status) {
-    // Use a default value
-    count_input = 3;
-  }
+  uint32_t count;
+uint32_t delay;
+uint32_t axis;
+int fetch_status;
 
-  fetch_status = fetch_uint32_arg(&delay_input);
-  if(fetch_status) {
-    // Use a default value
-    delay_input = 0xFFFFF;
-  }
+  fetch_status = fetch_uint32_arg(&count);
 
-  printf("cignatius2750_a2 returned: %d\n", cignatius2750_a2(count_input, delay_input) );
-}
-
-ADD_CMD("cignatius2750_a2", Assignment2, "Assignment 2")
-
-void StringTest(int action)
-{
-  if(action==CMD_SHORT_HELP) return;
-  if(action==CMD_LONG_HELP) {
-    printf("String Test\n\n"
-           "This command tests new string function by cignatius2750\n"
-           );
-    return;
-  }
-  int fetch_status;
-  char *destptr;
-  fetch_status = fetch_string_arg(&destptr);
   if (fetch_status) {
-    // Default logic goes here
+    count = 10;
   }
-  printf("string_test returned: %d\n", cignatius2750_string_test(destptr) );
+
+  fetch_status = fetch_uint32_arg(&delay);
+
+if (fetch_status) {
+  delay = 0xFFFFF;
 }
 
-ADD_CMD("cignatius2750_string", StringTest, "Test the new string function")
+fetch_status = fetch_uint32_arg(&axis);
+
+if (fetch_status) {
+  axis = 0;
+}
+
+  for (uint32_t i = 0; i < count; i++) {
+    float xyz[3] = {0};
+
+    BSP_GYRO_GetXYZ(xyz);
+
+    if (axis == 1) {
+  printf("Gyroscope returns:\n"
+         " X: %f\n",
+         xyz[0] / 256);
+}
+else if (axis == 2) {
+  printf("Gyroscope returns:\n"
+         " Y: %f\n",
+         xyz[1] / 256);
+}
+else if (axis == 3) {
+  printf("Gyroscope returns:\n"
+         " Z: %f\n",
+         xyz[2] / 256);
+}
+else {
+  printf("Gyroscope returns:\n"
+         " X: %f\n"
+         " Y: %f\n"
+         " Z: %f\n",
+         xyz[0] / 256,
+         xyz[1] / 256,
+         xyz[2] / 256);
+}
+    printf("cignatius2750_lab7 returned: %d\n", cignatius2750_lab7(delay) );
+  }
+}
+
+ADD_CMD("cignatius2750_lab7", Lab7_cignatius2750,"Test the new lab 7 function")
+
+int cignatius2750_a3(uint32_t wait, char *pattern_ptr, uint32_t num);
+
+void A3_cignatius2750(int action)
+{
+
+  if(action==CMD_SHORT_HELP) return;
+  if(action==CMD_LONG_HELP) {
+    printf("Assignment 3: Blinking Lights\n");
+printf("Usage: cignatius2750_a3 wait pattern num\n");
+printf("Example: cignatius2750_a3 0xFFFFF 11234 5\n");
+
+    return;
+  }
+
+int fetch_status;
+uint32_t wait;
+char *pattern;
+uint32_t num;
+
+  fetch_status = fetch_uint32_arg(&wait);
+
+if (fetch_status) {
+  wait = 0xFFFFF;
+}
+
+fetch_status = fetch_string_arg(&pattern);
+
+if (fetch_status) {
+  pattern = "1234";
+}
+
+fetch_status = fetch_uint32_arg(&num);
+
+if (fetch_status) {
+  num = 5;
+}
+
+printf("cignatius2750_a3 returned: %d\n", cignatius2750_a3(wait, pattern, num) );
+}
+
+ADD_CMD("cignatius2750_a3", A3_cignatius2750,"Run A3 for cignatius2750")

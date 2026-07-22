@@ -1,153 +1,173 @@
-@ cignatius2750_asm.s Data section - initialized values
-.data
-.align 3
-
-huge:   .octa 0xAABBCCDDDDCCBBFF
-big:    .word 0xAAEEBBFF
-num:    .byte 0xAB
-str2:   .asciz "Guten Tag!"
-count:  .word 12345
-
-@ End of new data section
-
-
-
-
 @ Test code for my own new function called from C
 
-    .code   16
-    .text
-
-    .align  2
-    .syntax unified
-    .global cignatius2750_add_test
-    .code   16
-    .thumb_func
-    .type   cignatius2750_add_test, %function
-
-@ Function Declaration : int cignatius2750_add_test (int x, int y)
-@
-@ Input: r0, r1 (i.e. r0 holds x, r1 holds y)
-@ Returns: r0
+@ This is a comment. Anything after an @ symbol is ignored.
+@@ This is also a comment. Some people use double @@ symbols. 
 
 
+    .code   16              @ This directive selects the instruction set being generated. 
+                            @ The value 16 selects Thumb, with the value 32 selecting ARM.
 
+    .text                   @ Tell the assembler that the upcoming section is to be considered
+                            @ assembly language instructions - Code section (text -> ROM)
 
-cignatius2750_add_test:
-    push {r4, r5, lr}
+@@ Function Header Block
+    .align  2               @ Code alignment - 2^n alignment (n=2)
+                            @ This causes the assembler to use 4 byte alignment
 
-    ldr r0, =num
-    ldr r0, =big
-    ldr r0, =huge
-    ldr r0, =str2
+    .syntax unified         @ Sets the instruction set to the new unified ARM + THUMB
+                            @ instructions. The default is divided (separate instruction sets)
 
-    ldr r2, =str2
-    ldrb r0, [r2]
+    .global cignatius2750_lab6        @ Make the symbol name for the function visible to the linker
 
-    ldr r2, =str2
-    ldr r0, [r2]
-
-    ldr r2, =num
-    ldrb r0, [r2]
-
-    ldr r2, =big
-    ldr r0, [r2]
-
-    ldr r2, =huge
-    ldrd r0, r1, [r2]
-
-    bkpt
-
-    add r4, r0, r1
-    mov r5, r2
-    mov r0, r5
-    bl busy_delay
-    mov r0, r4
-    pop {r4, r5, pc}
-
-
-.align  2               @ Code alignment is 2^n alignment (n=2)
-    .syntax unified         @ Sets the instruction set to the unified ARM + THUMB
-    .global cignatius2750_a2   @ Make the symbol name for the function visible to the linker
     .code   16              @ 16bit THUMB code (BOTH .code and .thumb_func are required)
     .thumb_func             @ Specifies that the following symbol is the name of a THUMB
-    .type   cignatius2750_a2, %function
+                            @ encoded function. Necessary for interlinking between ARM and THUMB code.
 
-@ Function Declaration : int cignatius2750_a2 (int num, int wait)
+    .type   cignatius2750_lab6, %function   @ Declares that the symbol is a function (not strictly required)
+
+@ Function Declaration: int cignatius2750_lab6(uint32_t delay)
 @
-@ Input: r0 (num), r1 (wait)
-@ Returns: r0 (total number of LED toggles performed)
+@ Input: r0 holds the delay value
+@ Returns: r0 holds the number of LED toggles
+
+@ Here is the actual cignatius2750_lab6 function
+cignatius2750_lab6:
+    push {r4-r7, lr}
+
+    mov r4, r0
+    mov r5, #7
+    mov r6, #0
+
+lab6_loop:
+    cmp r5, #0
+    bge lab6_toggle
+
+    mov r5, #7
+
+lab6_toggle:
+    mov r0, r5
+    bl BSP_LED_Toggle
+
+    add r6, r6, #1
+    sub r5, r5, #1
+
+    mov r0, r4
+    bl busy_delay
+
+    mov r0, #0
+    bl BSP_PB_GetState
+
+    cmp r0, #0
+    beq lab6_loop
+
+    mov r0, r6
+
+    pop {r4-r7, lr}
+    bx lr           @ Return (Branch eXchange) to the address in the link register (lr) 
+    .size   cignatius2750_lab6, .-cignatius2750_lab6    @@ - symbol size (not strictly required, but makes the debugger happy)
+
+@@ Function Header Block
+    .global cignatius2750_lab7
+    .type cignatius2750_lab7, %function
+
+@ Function Declaration: int cignatius2750_lab7(uint32_t delay)
 @
-cignatius2750_a2:
-    push {r4, r5, r6, r7, lr}   @ Save registers we'll use, and the return address
-    mov  r4, r0                 @ r4 = num (repeat count) - save it before r0 gets overwritten by calls
-    mov  r5, r1                 @ r5 = wait (delay value) - save it before r1 gets overwritten by calls
-    movs r6, #0                 @ r6 = LED index, starts at 0 (will count 0 to 7)
-    movs r7, #0                 @ r7 = total toggle count, starts at 0
-
-outer_loop:
-    movs r6, #0                 @ Reset LED index to 0 at the start of each repeat
-
-inner_loop:
-    mov  r0, r6                 @ Put current LED index into r0 (BSP_LED_Toggle's argument)
-    bl   BSP_LED_Toggle         @ Toggle that LED
-    add  r7, r7, #1             @ Count this toggle (increment total)
-    mov  r0, r5                 @ Put wait value into r0 (busy_delay's argument)
-    bl   busy_delay              @ Wait before the next toggle
-    add  r6, r6, #1             @ Move to next LED index
-    cmp  r6, #8                 @ Have we done all 8 LEDs yet?
-    blt  inner_loop              @ If not, keep toggling
-
-    subs r4, r4, #1             @ One repeat finished, decrement num
-    bgt  outer_loop              @ If more repeats remain, start over
-
-    mov  r0, r7                 @ Put total toggle count into r0 (our return value)
-    pop  {r4, r5, r6, r7, pc}   @ Restore registers and return (pc = pop into program counter)
-    .size   cignatius2750_a2, .- cignatius2750_a2
-.global cignatius2750_string_test
-.code   16
-    .thumb_func
-    .type   cignatius2750_string_test, %function
-
-@ Function Declaration : int cignatius2750_string_test(char *p)
-@
-@ Input: r0 (i.e. r0 a pointer to a byte array)
+@ Input: r0 holds the delay value
 @ Returns: r0
+
+cignatius2750_lab7:
+    push {lr}
+
+    bl busy_delay
+
+    pop {lr}
+    bx lr
+
+    .size cignatius2750_lab7, .-cignatius2750_lab7
+
+.global cignatius2750_a3
+.type   cignatius2750_a3, %function
+
+@ Function Declaration: int cignatius2750_a3(char *pattern_ptr)
 @
-@ Here is the actual function
-cignatius2750_string_test:
-StringLoop:
-    ldrb r1, [r0]                @ Load the byte that r0 points to, into r1
-    cmp  r1, #0                  @ Check if that byte is zero (end of string)
-    beq  OutLabel                @ If it is zero, we're done - branch out
-    add  r0, r0, #1              @ Move to the next character (next address)
-    b    StringLoop               @ Go back and check the next character
-OutLabel:
-    bx lr                        @ Return (r0 now holds the address right after the last character)
-    .size   cignatius2750_string_test, .-cignatius2750_string_test
-@ Function Declaration : int busy_delay(int cycles)
-@
-@ Input: r0 (i.e. r0 holds number of cycles to delay)
+@ Input: r0 (i.e. r0 is a pointer to the first character of the pattern)
 @ Returns: r0
 @ 
 
-@ Here is the actual function. DO NOT MODIFY THIS FUNCTION.
+@ Here is the function
+cignatius2750_a3:
+    push {r4-r8, lr}        @ Save registers used by this function
+
+    mov r4, r0              @ r4 = wait delay value
+    mov r5, r1              @ r5 = pointer to pattern string
+    mov r6, r2              @ r6 = number of repeats remaining
+    mov r7, #0              @ r7 = count of BSP_LED_Toggle calls
+
+a3_repeat_loop:
+    cmp r6, #0              @ Check if all repeats are finished
+    beq a3_done             @ If no repeats remain, finish
+
+    mov r8, r5              @ Restart pattern from first character
+
+a3_pattern_loop:
+    ldrb r0, [r8]           @ Load current pattern character
+    cmp r0, #0              @ Check for end of string
+    beq a3_repeat_done      @ If pattern ended, one repeat is done
+
+    cmp r0, #'0'            @ Check if character is below '0'
+    blt a3_next_char        @ If invalid, skip it
+
+    cmp r0, #'7'            @ Check if character is above '7'
+    bgt a3_next_char        @ If invalid, skip it
+
+    sub r0, r0, #'0'        @ Convert ASCII digit to LED number
+    bl BSP_LED_Toggle       @ Toggle selected LED
+    add r7, r7, #1          @ Increase toggle count
+
+    mov r0, r4              @ Pass wait delay to busy_delay
+    bl busy_delay           @ Wait between toggles
+
+    mov r0, #0              @ User button number
+    bl BSP_PB_GetState      @ Read blue user button
+
+    cmp r0, #0              @ 0 means button not pressed
+    bne a3_done             @ If pressed, stop early
+
+a3_next_char:
+    add r8, r8, #1          @ Move to next character
+    b a3_pattern_loop       @ Continue pattern loop
+
+a3_repeat_done:
+    sub r6, r6, #1          @ One full pattern repeat is complete
+    b a3_repeat_loop        @ Start next repeat if needed
+
+a3_done:
+    mov r0, r7              @ Return number of LED toggles
+
+    pop {r4-r8, lr}         @ Restore saved registers
+    bx lr                   @ Return to C hook
+    .size   cignatius2750_a3, .-cignatius2750_a3
+@
+@ Input: r0 (i.e. r0 is how many cycles to delay)
+@ Returns: r0
+@ 
+
+@ Here is the actual function. DO NOT MODIFY THIS FUNCTION
 busy_delay:
-
     push {r6}
-
     mov r6, r0
 
-delay_label:
-    subs r6, r6, #1
+    d3lay_loop:
+        subs r6, r6, #1
+        bge d3lay_loop
 
-    bge delay_label
-
-    mov r0, #0                      @ Always return zero (success)
+        mov r0, #0      @ Return zero (success)
 
     pop {r6}
+    bx lr               @ Return to calling function
 
-    bx lr                           @ Return (Branch eXchange) to the address in the link register (lr)
 
-
+@ Assembly file ended by single .end directive on its own line
 .end
+
+Things past the end directive are not processed, as you can see here.
