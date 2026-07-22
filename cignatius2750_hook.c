@@ -1,5 +1,5 @@
 /*
- *  C to assembler menu hook
+ *  C to assembler menu hook - Lab 8 Version
  *
  *  Modified by cignatius2750
  * 
@@ -9,144 +9,105 @@
 #include <stdint.h>
 #include <ctype.h>
 
-#include "common.h"
 #include "stm32f3_discovery_gyroscope.h"
 
+#include "common.h"
 
-int cignatius2750_lab6(uint32_t delay);
-int cignatius2750_lab7(uint32_t delay);
+#define N 500
 
-void Lab6_cignatius2750(int action)
+// A4 Interrupt Handlers - these are in cignatius2750_asm.s
+void cignatius2750_a4_btn(void);
+void cignatius2750_a4_tick(void);
+
+
+// Timer tick hook for our timer interrupt
+// driven programming.
+//
+// Note that for now, this function toggles LED 0 every N cycles.
+void cignatius2750_tick(void)
+{
+  // Our tick variable is static so that it keeps its value from one
+  // function call to the next.
+  //
+  // If this was not static, this would not work because ticks would
+  // get reinitialized every time the function was called.
+  static int32_t ticks;
+  
+  // Increment our tick count every time the timer interrupt fires.
+  // Can you measure approximately how fast the tick is running? Try
+  // timing how long it takes for the LED to blink 10 times.
+  ticks++;
+
+  // Every time we reach N cycles, reset the tick count to zero
+  // and toggle LED 0.
+  //
+  // This proves to us that our interrupt is working.
+  if (ticks > N)
+  {
+    ticks = 0;
+    cignatius2750_a4_tick();
+  }
+
+
+}
+
+// Button press hook for our button interrupt
+// driven programming.
+//
+// Note that for now, this function toggles LED 6 when the button is pressed.
+void cignatius2750_btn(void)
+{
+  // For now, just toggle an LED to prove the button press was noticed.
+  cignatius2750_a4_btn();
+}
+
+int cignatius2750_lab8(void);
+
+void Lab8_cignatius2750(int action)
 {
 
   if(action==CMD_SHORT_HELP) return;
   if(action==CMD_LONG_HELP) {
-    printf("Lab 6\n\n"
-	   "This command tests new lab 6 function by cignatius2750\n"
+    printf("Lab 8\n\n"
+	   "This command tests new lab 8 function by cignatius2750\n"
 	   );
 
     return;
   }
-  uint32_t delay;
-int fetch_status;
 
-fetch_status = fetch_uint32_arg(&delay);
 
-if (fetch_status) {
-  delay = 0xFFFFF;
+  printf("cignatius2750_lab8 returned: %d\n", cignatius2750_lab8() );
 }
 
-printf("cignatius2750_lab6 returned: %d\n", cignatius2750_lab6(delay) );
-}
+ADD_CMD("cignatius2750_lab8", Lab8_cignatius2750,"Test the new lab 8 function")
 
-ADD_CMD("cignatius2750_lab6", Lab6_cignatius2750,"Test the new lab 6 function")
-void Lab7_cignatius2750(int action)
+int cignatius2750_a4(int x);
+
+void A4_cignatius2750(int action)
 {
+
   if(action==CMD_SHORT_HELP) return;
   if(action==CMD_LONG_HELP) {
-    printf("Lab 7\n\n"
-           "This command tests new lab 7 function by cignatius2750\n"
-           );
+    printf("Assignment 4 Test\n\n"
+	   "This command tests new A4 function by cignatius2750\n"
+	   );
 
     return;
   }
 
-  uint32_t count;
-uint32_t delay;
-uint32_t axis;
-int fetch_status;
+  int fetch_status;
+  uint32_t a4_start;
 
-  fetch_status = fetch_uint32_arg(&count);
+  fetch_status = fetch_uint32_arg(&a4_start);
 
   if (fetch_status) {
-    count = 10;
+    a4_start = 1;
   }
 
-  fetch_status = fetch_uint32_arg(&delay);
 
-if (fetch_status) {
-  delay = 0xFFFFF;
+  printf("cignatius2750_a4 returned: %d\n", cignatius2750_a4(a4_start) );
 }
 
-fetch_status = fetch_uint32_arg(&axis);
+ADD_CMD("cignatius2750_a4", A4_cignatius2750,"Test the A4 function")
 
-if (fetch_status) {
-  axis = 0;
-}
 
-  for (uint32_t i = 0; i < count; i++) {
-    float xyz[3] = {0};
-
-    BSP_GYRO_GetXYZ(xyz);
-
-    if (axis == 1) {
-  printf("Gyroscope returns:\n"
-         " X: %f\n",
-         xyz[0] / 256);
-}
-else if (axis == 2) {
-  printf("Gyroscope returns:\n"
-         " Y: %f\n",
-         xyz[1] / 256);
-}
-else if (axis == 3) {
-  printf("Gyroscope returns:\n"
-         " Z: %f\n",
-         xyz[2] / 256);
-}
-else {
-  printf("Gyroscope returns:\n"
-         " X: %f\n"
-         " Y: %f\n"
-         " Z: %f\n",
-         xyz[0] / 256,
-         xyz[1] / 256,
-         xyz[2] / 256);
-}
-    printf("cignatius2750_lab7 returned: %d\n", cignatius2750_lab7(delay) );
-  }
-}
-
-ADD_CMD("cignatius2750_lab7", Lab7_cignatius2750,"Test the new lab 7 function")
-
-int cignatius2750_a3(uint32_t wait, char *pattern_ptr, uint32_t num);
-
-void A3_cignatius2750(int action)
-{
-
-  if(action==CMD_SHORT_HELP) return;
-  if(action==CMD_LONG_HELP) {
-    printf("Assignment 3: Blinking Lights\n");
-printf("Usage: cignatius2750_a3 wait pattern num\n");
-printf("Example: cignatius2750_a3 0xFFFFF 11234 5\n");
-
-    return;
-  }
-
-int fetch_status;
-uint32_t wait;
-char *pattern;
-uint32_t num;
-
-  fetch_status = fetch_uint32_arg(&wait);
-
-if (fetch_status) {
-  wait = 0xFFFFF;
-}
-
-fetch_status = fetch_string_arg(&pattern);
-
-if (fetch_status) {
-  pattern = "1234";
-}
-
-fetch_status = fetch_uint32_arg(&num);
-
-if (fetch_status) {
-  num = 5;
-}
-
-printf("cignatius2750_a3 returned: %d\n", cignatius2750_a3(wait, pattern, num) );
-}
-
-ADD_CMD("cignatius2750_a3", A3_cignatius2750,"Run A3 for cignatius2750")

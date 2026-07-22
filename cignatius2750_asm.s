@@ -1,4 +1,7 @@
-@ Test code for my own new function called from C
+@ Assembly File - Lab 8 Version
+@
+@ NOTE THERE IS A DATA SECTION AT THE END OF THIS FILE FOR ASSIGNMENT 4
+@ USE THAT DATA SECTION FOR ANY DATA YOU NEED, DO NOT ADD ANOTHER.
 
 @ This is a comment. Anything after an @ symbol is ignored.
 @@ This is also a comment. Some people use double @@ symbols. 
@@ -17,136 +20,155 @@
     .syntax unified         @ Sets the instruction set to the new unified ARM + THUMB
                             @ instructions. The default is divided (separate instruction sets)
 
-    .global cignatius2750_lab6        @ Make the symbol name for the function visible to the linker
+    .global cignatius2750_lab8        @ Make the symbol name for the function visible to the linker
 
     .code   16              @ 16bit THUMB code (BOTH .code and .thumb_func are required)
     .thumb_func             @ Specifies that the following symbol is the name of a THUMB
                             @ encoded function. Necessary for interlinking between ARM and THUMB code.
 
-    .type   cignatius2750_lab6, %function   @ Declares that the symbol is a function (not strictly required)
+    .type   cignatius2750_lab8, %function   @ Declares that the symbol is a function (not strictly required)
 
-@ Function Declaration: int cignatius2750_lab6(uint32_t delay)
+@ Function Declaration : void cignatius2750_lab8(void)
 @
-@ Input: r0 holds the delay value
-@ Returns: r0 holds the number of LED toggles
+@ Input: none
+@ Returns: nothing
+@ 
 
-@ Here is the actual cignatius2750_lab6 function
-cignatius2750_lab6:
-    push {r4-r7, lr}
-
-    mov r4, r0
-    mov r5, #7
-    mov r6, #0
-
-lab6_loop:
-    cmp r5, #0
-    bge lab6_toggle
-
-    mov r5, #7
-
-lab6_toggle:
-    mov r0, r5
-    bl BSP_LED_Toggle
-
-    add r6, r6, #1
-    sub r5, r5, #1
-
-    mov r0, r4
-    bl busy_delay
-
-    mov r0, #0
-    bl BSP_PB_GetState
-
-    cmp r0, #0
-    beq lab6_loop
-
-    mov r0, r6
-
-    pop {r4-r7, lr}
-    bx lr           @ Return (Branch eXchange) to the address in the link register (lr) 
-    .size   cignatius2750_lab6, .-cignatius2750_lab6    @@ - symbol size (not strictly required, but makes the debugger happy)
-
-@@ Function Header Block
-    .global cignatius2750_lab7
-    .type cignatius2750_lab7, %function
-
-@ Function Declaration: int cignatius2750_lab7(uint32_t delay)
-@
-@ Input: r0 holds the delay value
-@ Returns: r0
-
-cignatius2750_lab7:
+@ Here is the actual cignatius2750_lab8 function
+cignatius2750_lab8:
     push {lr}
 
+    @ For now, this function just toggles, delays, and toggles again.
+    mov r0, #3
+    bl BSP_LED_Toggle
+
+    ldr r0, =0xFFFFFFF
     bl busy_delay
+
+    mov r0, #3
+    bl BSP_LED_Toggle
+
+    pop {lr}
+    bx lr                           @ Return (Branch eXchange) to the address in the link register (lr) 
+    .size   cignatius2750_lab8, .-cignatius2750_lab8    @@ - symbol size (not strictly required, but makes the debugger happy)
+
+
+
+
+.global cignatius2750_a4
+.type   cignatius2750_a4, %function
+
+@ Function Declaration : int cignatius2750_a4(int x)
+@
+@ Input: Document this
+@ Returns: Document this
+@ 
+
+@ Here is the actual function
+cignatius2750_a4:
+
+    @ This function only exists to start / initialize your A4
+    @ logic working. No actions should be taken in this logic,
+    @ aside from storing the parameters your A4 logic needs to run.
+
+    @ Store the value we received indicating the running state
+    ldr r1, =a4_is_running
+    str r0, [r1]
+
+    bx lr
+    .size   cignatius2750_a4, .-cignatius2750_a4
+
+
+.global cignatius2750_a4_btn
+.type   cignatius2750_a4_btn, %function
+
+@ Function Declaration : void cignatius2750_a4_btn(void)
+@
+@ Input: None
+@ Returns: Nothing
+@ 
+@ Reminder - this requires the button has been initialized as an interrupt
+@ in main.c using BSP_PB_Init(BUTTON_USER, BUTTON_MODE_EXTI)
+@ as well as requires a new function set up void EXTI0_IRQHandler(void)
+
+@ Here is the actual function
+cignatius2750_a4_btn:
+    push {lr}
+
+    ldr r1, =a4_button_count        @ Get the address of the counter
+    ldr r0, [r1]                    @ Get the actual count
+    add r0, r0, #1                  @ Increment the count
+    and r0, #7                      @ Keep the count between 0 and 7
+    str r0, [r1]                    @ Store the new count
+
+    bl BSP_LED_Toggle               @ Toggle the current LED
 
     pop {lr}
     bx lr
+    .size   cignatius2750_a4_btn, .-cignatius2750_a4_btn
 
-    .size cignatius2750_lab7, .-cignatius2750_lab7
 
-.global cignatius2750_a3
-.type   cignatius2750_a3, %function
+.global cignatius2750_a4_tick
+.type   cignatius2750_a4_tick, %function
 
-@ Function Declaration: int cignatius2750_a3(char *pattern_ptr)
+@ Function Declaration : void cignatius2750_a4_tick(void)
 @
-@ Input: r0 (i.e. r0 is a pointer to the first character of the pattern)
-@ Returns: r0
+@ Input: None
+@ Returns: Nothing
 @ 
 
-@ Here is the function
-cignatius2750_a3:
-    push {r4-r8, lr}        @ Save registers used by this function
+@ Here is the actual function
+cignatius2750_a4_tick:
+    push {lr}
 
-    mov r4, r0              @ r4 = wait delay value
-    mov r5, r1              @ r5 = pointer to pattern string
-    mov r6, r2              @ r6 = number of repeats remaining
-    mov r7, #0              @ r7 = count of BSP_LED_Toggle calls
+    @ As a starting point, this function implements the basics needed
+    @ to determine if our A4 logic should be running.
+    @
+    @ You will have to add logic here for A4.
 
-a3_repeat_loop:
-    cmp r6, #0              @ Check if all repeats are finished
-    beq a3_done             @ If no repeats remain, finish
+    @ Some useful notes
+    @
+    @ BSP_LED_On, BSP_LED_Off - same argument as BSP_LED_Toggle, sets
+    @ the LED to ON or OFF as you tell it
+    @
+    @ How to delay: DO NOT use busy_delay - remember, this is an interrupt
+    @ handler. If you need a delay, use a counter to count how many times
+    @ this function has been called, and use that to skip a desired number
+    @ of calls.
 
-    mov r8, r5              @ Restart pattern from first character
 
-a3_pattern_loop:
-    ldrb r0, [r8]           @ Load current pattern character
-    cmp r0, #0              @ Check for end of string
-    beq a3_repeat_done      @ If pattern ended, one repeat is done
+    @ ***** Get something
+    ldr r1, =a4_is_running
+    ldr r0, [r1]
 
-    cmp r0, #'0'            @ Check if character is below '0'
-    blt a3_next_char        @ If invalid, skip it
+    @ ***** Check something
+    cmp r0, #0
+    ble a4_skip
 
-    cmp r0, #'7'            @ Check if character is above '7'
-    bgt a3_next_char        @ If invalid, skip it
+        @ This part below is skipped if A4 is NOT running. You will want to
+        @ keep all your A4 logic inside here.
+        @ DO NOT PUT LOGIC FOR A4 ABOVE THIS LINE -----------------------------
 
-    sub r0, r0, #'0'        @ Convert ASCII digit to LED number
-    bl BSP_LED_Toggle       @ Toggle selected LED
-    add r7, r7, #1          @ Increase toggle count
+        @ Even within this logic, you should still take a philosopy of check
+        @ things, do things, and store things - do not use delays of any sort,
+        @ and only use loops if they are bounded (that is, guaranteed to end)
 
-    mov r0, r4              @ Pass wait delay to busy_delay
-    bl busy_delay           @ Wait between toggles
+        @ ***** Do something
+        mov r0, #0
+        bl BSP_LED_Toggle
 
-    mov r0, #0              @ User button number
-    bl BSP_PB_GetState      @ Read blue user button
+        @ DO NOT PUT LOGIC FOR A4 BELOW THIS LINE -----------------------------
+        @ End of A4 skipped logic. Do not add logic below here.
 
-    cmp r0, #0              @ 0 means button not pressed
-    bne a3_done             @ If pressed, stop early
+    a4_skip:
 
-a3_next_char:
-    add r8, r8, #1          @ Move to next character
-    b a3_pattern_loop       @ Continue pattern loop
+    @ ***** End of our tick function
+    pop {lr}
+    bx lr
+    .size   cignatius2750_a4_tick, .-cignatius2750_a4_tick
 
-a3_repeat_done:
-    sub r6, r6, #1          @ One full pattern repeat is complete
-    b a3_repeat_loop        @ Start next repeat if needed
 
-a3_done:
-    mov r0, r7              @ Return number of LED toggles
-
-    pop {r4-r8, lr}         @ Restore saved registers
-    bx lr                   @ Return to C hook
-    .size   cignatius2750_a3, .-cignatius2750_a3
+@ Function Declaration : int busy_delay(int cycles)
 @
 @ Input: r0 (i.e. r0 is how many cycles to delay)
 @ Returns: r0
@@ -165,6 +187,13 @@ busy_delay:
 
     pop {r6}
     bx lr               @ Return to calling function
+
+
+@ Here is another data section, we will use it for some key interrupt items
+@ We will put all necessary data for A4 in this block
+.data
+a4_is_running: .word 0
+a4_button_count: .word 0
 
 
 @ Assembly file ended by single .end directive on its own line
